@@ -1,261 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Voucher Card</title>
-  <style>
-    :root {
-      --primary: #4a90e2;
-      --accent: #4cd964;
-      --bg: #f9fafb;
-      --card-bg: #ffffff;
-      --text: #333;
-      --shadow: rgba(0, 0, 0, 0.08);
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 1rem;
-    }
-
-    .voucher-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 8px 24px var(--shadow);
-      max-width: 520px;
-      margin: auto;
-    }
-
-    .section {
-      margin-bottom: 1.5rem;
-    }
-
-    h2, h3 {
-      margin: 0 0 0.5rem;
-      font-size: 1.2rem;
-    }
-
-    p {
-      margin: 0.25rem 0;
-      font-size: 0.95rem;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    .button-group button {
-      flex: 1;
-      padding: 0.6rem;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      background: #f1f3f6;
-      color: var(--text);
-      cursor: pointer;
-      box-shadow: inset 0 2px 4px #e0e0e0;
-      transition: 0.3s ease;
-    }
-
-    .button-group button.active {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 0.6rem;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      margin-top: 0.4rem;
-    }
-
-    .add-btn {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: var(--accent);
-      color: #fff;
-      font-weight: bold;
-      font-size: 0.95rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .add-btn:hover {
-      background-color: #3ccf7a;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fdfdfd;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px var(--shadow);
-      font-size: 0.9rem;
-    }
-
-    th, td {
-      padding: 0.6rem;
-      text-align: center;
-      border-bottom: 1px solid #eee;
-    }
-
-    th {
-      background-color: #f5f7fa;
-    }
-
-    .totals {
-      background: #fefefe;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px var(--shadow);
-      font-size: 0.95rem;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft UI – Casino Voucher Generator</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #ecf0f3; padding: 15px; display: flex; justify-content: center; }
+  .container { display: flex; gap: 20px; flex-wrap: wrap; }
+  .form-section, .preview-section { background: #ecf0f3; padding: 20px; border-radius: 20px; box-shadow: 7px 7px 15px #c5c7c9, -7px -7px 15px #fff; }
+  .form-section { width: 350px; }
+  .preview-section { width: 350px; }
+  h2 { text-align: center; font-size: 1.3em; margin-bottom: 15px; color: #333; }
+  label { display: block; margin: 6px 0 3px; font-size: 0.85em; color: #555; }
+  input, select, textarea, button { width: 100%; padding: 10px; border-radius: 12px; border: none; background: #ecf0f3; box-shadow: inset 3px 3px 6px #c5c7c9, inset -3px -3px 6px #fff; font-size: 0.85em; margin-bottom: 10px; color: #333; }
+  textarea { height: 300px; resize: none; }
+  button { background: linear-gradient(145deg, #56ab2f, #a8e063); box-shadow: 3px 3px 6px #c5c7c9, -3px -3px 6px #fff; color: white; font-weight: bold; cursor: pointer; border: none; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  button:hover { transform: scale(1.05); box-shadow: 4px 4px 8px #b5b7b9, -4px -4px 8px #fff; }
+  button:active { transform: scale(0.97); box-shadow: inset 2px 2px 4px #c5c7c9, inset -2px -2px 4px #fff; }
+  .stats { background: #ecf0f3; padding: 10px; border-radius: 12px; box-shadow: inset 3px 3px 6px #c5c7c9, inset -3px -3px 6px #fff; font-size: 0.85em; color: #333; margin-bottom: 10px; }
+  #bkWarning { font-size: 0.8em; color: red; margin-top: -6px; margin-bottom: 8px; display: none; }
+</style>
 </head>
 <body>
-  <div class="voucher-card">
-    <div class="section">
-      <h2>Today: Voucher Provided</h2>
-      <p>Date: <span id="currentDate"></span></p>
+<div class="container">
+  <div class="form-section">
+    <h2>Voucher Generator</h2>
+    <label>Template Type:</label>
+    <select id="templateType" onchange="toggleFieldsAndClear()">
+      <option value="On Loss">On Loss</option>
+      <option value="On Deposit">On Deposit</option>
+    </select>
+    <label>Currency:</label>
+    <select id="currency">
+      <option>INR</option><option>BRL</option><option>XOF</option><option>MYR</option><option>ARS</option><option>USD</option><option>XAF</option><option>RUB</option><option>TRY</option><option>AED</option><option>KZT</option><option>AMD</option><option>KES</option><option>CLP</option>
+    </select>
+    <label for="presetPeriod" id="presetPeriodLabel">Select Period:</label>
+    <select id="presetPeriod" onchange="setPresetPeriod()">
+      <option value="">Custom</option>
+      <option value="lastMonth">Last 1 Month</option>
+    </select>
+    <label>BK Income Period Start:</label>
+    <input type="date" id="startDate">
+    <label>BK Income Period End:</label>
+    <input type="date" id="endDate">
+    <label>Last Voucher Activated:</label>
+    <input type="date" id="lastVoucherDate">
+    <div id="lossFields">
+      <label>Deposit:</label>
+      <input type="number" id="deposit" oninput="checkBkIncome()">
+      <label>Withdrawal:</label>
+      <input type="number" id="withdrawal" oninput="checkBkIncome()">
+      <label>BK Income:</label>
+      <input type="number" id="bkIncome" oninput="checkBkIncome()">
+      <div id="bkWarning">⚠ BK Income is different from Deposit - Withdrawal</div>
     </div>
-
-    <div class="section button-group">
-      <button id="createBtn" class="active">Voucher Create</button>
-      <button id="providedBtn">Voucher Provided</button>
+    <div id="depositFields" style="display:none">
+      <label>Deposit:</label>
+      <input type="number" id="depositOnly">
     </div>
-
-    <div class="section">
-      <label for="amount">Amount</label>
-      <input type="number" id="amount" placeholder="Enter Amount">
-    </div>
-
-    <div class="section">
-      <label for="currency">Currency</label>
-      <select id="currency">
-        <option>INR</option>
-        <option>BRL</option>
-        <option>XOF</option>
-        <option>MYR</option>
-        <option>ARS</option>
-        <option>USD</option>
-        <option>XAF</option>
-        <option>RUB</option>
-        <option>TRY</option>
-        <option>AED</option>
-        <option>KZT</option>
-        <option>AMD</option>
-        <option>KES</option>
-        <option>CLP</option>
-      </select>
-    </div>
-
-    <div class="section">
-      <button class="add-btn" onclick="addVoucher()">➕ Add Voucher</button>
-    </div>
-
-    <div class="section">
-      <h3>Created Vouchers</h3>
-      <table id="createTable">
-        <tr><th>Sr No.</th><th>Amount</th><th>Currency</th></tr>
-      </table>
-      <p>Total Created: <span id="createCount">0</span></p>
-    </div>
-
-    <div class="section">
-      <h3>Provided Vouchers</h3>
-      <table id="provideTable">
-        <tr><th>Sr No.</th><th>Amount</th><th>Currency</th></tr>
-      </table>
-      <p>Total Provided: <span id="provideCount">0</span></p>
-    </div>
-
-    <div class="totals" id="totals"></div>
+    <label>System Bonus:</label>
+    <input type="number" id="systemBonus">
+    <label>Voucher Amount (%):</label>
+    <input type="number" id="percentage" value="12">
+    <button onclick="generateTemplate()">Generate Template</button>
+    <button id="copyBtn" onclick="copyTemplate()">Copy</button>
+    <button onclick="countVoucher()">Count Voucher</button>
   </div>
+  <div class="preview-section">
+    <textarea id="output" readonly></textarea>
+    <div class="stats" id="stats">Total Vouchers: 0</div>
+    <label>Voucher Provided Amount:</label>
+    <input type="number" id="providedAmount">
+    <select id="providedCurrency">
+      <option>INR</option><option>BRL</option><option>XOF</option><option>MYR</option><option>ARS</option><option>USD</option><option>XAF</option><option>RUB</option><option>TRY</option><option>AED</option><option>KZT</option><option>AMD</option><option>KES</option><option>CLP</option>
+    </select>
+    <button onclick="countProvidedVoucher()">Count Provided Voucher</button>
+    <div class="stats" id="providedStats">Total Provided Vouchers: 0</div>
+    <div class="stats" id="combinedStats">Combined Income (Created + Provided):</div>
+  </div>
+</div>
+<script>
+let voucherStats = {};
+let providedStatsData = {};
 
-  <script>
-    const dateSpan = document.getElementById("currentDate");
-    const createBtn = document.getElementById("createBtn");
-    const providedBtn = document.getElementById("providedBtn");
-    const currencySelect = document.getElementById("currency");
-    const amountInput = document.getElementById("amount");
-    const createTable = document.getElementById("createTable");
-    const provideTable = document.getElementById("provideTable");
-    const totalsDiv = document.getElementById("totals");
-    const createCount = document.getElementById("createCount");
-    const provideCount = document.getElementById("provideCount");
+function setPresetPeriod() {
+  const preset = document.getElementById('presetPeriod').value;
+  if (preset === 'lastMonth') {
+    const end = new Date();
+    const start = new Date();
+    start.setMonth(start.getMonth() - 1);
+    document.getElementById('startDate').value = start.toISOString().slice(0,10);
+    document.getElementById('endDate').value = end.toISOString().slice(0,10);
+  }
+}
 
-    let currentMode = "create";
-    let createData = [];
-    let provideData = [];
+function toggleFieldsAndClear() {
+  const type = document.getElementById('templateType').value;
 
-    dateSpan.textContent = new Date().toLocaleDateString();
+  document.getElementById('lossFields').style.display = (type === 'On Loss') ? 'block' : 'none';
+  document.getElementById('depositFields').style.display = (type === 'On Deposit') ? 'block' : 'none';
 
-    createBtn.onclick = () => {
-      currentMode = "create";
-      createBtn.classList.add("active");
-      providedBtn.classList.remove("active");
-    };
-    providedBtn.onclick = () => {
-      currentMode = "provide";
-      providedBtn.classList.add("active");
-      createBtn.classList.remove("active");
-    };
+  // Hide/Show Select Period based on type
+  document.getElementById('presetPeriodLabel').style.display = (type === 'On Loss') ? 'block' : 'none';
+  document.getElementById('presetPeriod').style.display = (type === 'On Loss') ? 'block' : 'none';
 
-    function addVoucher() {
-      const amount = parseFloat(amountInput.value);
-      const currency = currencySelect.value;
-      if (!amount || amount <= 0) return;
+  const startDateField = document.getElementById('startDate');
+  const endDateField = document.getElementById('endDate');
 
-      const entry = { amount, currency };
-      if (currentMode === "create") {
-        createData.push(entry);
-        renderTable(createTable, createData);
-        createCount.textContent = createData.length;
-      } else {
-        provideData.push(entry);
-        renderTable(provideTable, provideData);
-        provideCount.textContent = provideData.length;
-      }
-      updateTotals();
-      amountInput.value = "";
-    }
+  if (type === 'On Loss') {
+    startDateField.type = 'date';
+    endDateField.type = 'date';
+  } else {
+    startDateField.type = 'datetime-local';
+    endDateField.type = 'datetime-local';
+  }
 
-    function renderTable(table, data) {
-      let rows = "<tr><th>Sr No.</th><th>Amount</th><th>Currency</th></tr>";
-      data.forEach((item, index) => {
-        rows += `<tr><td>${index + 1}</td><td>${item.amount}</td><td>${item.currency}</td></tr>`;
-      });
-      table.innerHTML = rows;
-    }
+  document.querySelectorAll('#deposit, #withdrawal, #bkIncome, #depositOnly, #systemBonus, #percentage')
+    .forEach(el => el.value = '');
+  
+  startDateField.value = '';
+  endDateField.value = '';
+}
 
-    function updateTotals() {
-      const allData = [...createData, ...provideData];
-      const totals = {};
+function checkBkIncome() {
+  const deposit = parseFloat(document.getElementById('deposit').value) || 0;
+  const withdrawal = parseFloat(document.getElementById('withdrawal').value) || 0;
+  const bkIncome = parseFloat(document.getElementById('bkIncome').value) || 0;
+  document.getElementById('bkWarning').style.display = Math.abs(bkIncome - (deposit - withdrawal)) > 0.01 ? 'block' : 'none';
+}
 
-      allData.forEach(item => {
-        if (!totals[item.currency]) totals[item.currency] = 0;
-        totals[item.currency] += item.amount;
-      });
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-');
+  return `${day}-${month}-${year}`;
+}
 
-      let html = '<h4>Total Vouchers Summary</h4>';
-      html += '<ul>';
-      for (let currency in totals) {
-        html += `<li>${currency}: ${totals[currency].toFixed(2)}</li>`;
-      }
-      html += `</ul><strong>Total Vouchers: ${createData.length + provideData.length}</strong>`;
-      totalsDiv.innerHTML = html;
-    }
-  </script>
+function generateTemplate() {
+  const type = document.getElementById('templateType').value;
+  const currency = document.getElementById('currency').value;
+  const startDate = formatDate(document.getElementById('startDate').value.split('T')[0]);
+  const endDate = formatDate(document.getElementById('endDate').value.split('T')[0]);
+
+  let lastVoucherDateValue = document.getElementById('lastVoucherDate').value;
+  const lastVoucherDate = lastVoucherDateValue ? formatDate(lastVoucherDateValue) : 'N/A';
+
+  const deposit = type === 'On Loss' ? (parseFloat(document.getElementById('deposit').value) || 0) : (parseFloat(document.getElementById('depositOnly').value) || 0);
+  const withdrawal = parseFloat(document.getElementById('withdrawal')?.value) || 0;
+  const bkIncome = parseFloat(document.getElementById('bkIncome')?.value) || 0;
+  const systemBonus = parseFloat(document.getElementById('systemBonus').value) || 0;
+  const percentage = parseFloat(document.getElementById('percentage').value) || 12;
+
+  let voucherAmount = (type === 'On Loss') ? (bkIncome * percentage) / 100 : (deposit * percentage) / 100;
+  if (systemBonus >= 1000) voucherAmount = Math.max(0, voucherAmount - systemBonus);
+
+  let template = `Type of Bonus: Manual\nReason for Providing: ${type}\nBK Income Period: [${startDate}] – [${endDate}]\nLast Voucher Activated: [${lastVoucherDate}]\n`;
+  if (type === 'On Loss') {
+    template += `Deposit: ${deposit} ${currency}\nWithdrawal: ${withdrawal} ${currency}\nBK Income: ${bkIncome} ${currency}\nSystem Bonus: ${systemBonus} ${currency}\nVoucher Amount: ${voucherAmount.toFixed(2)} ${currency}`;
+  } else {
+    template += `Deposit: ${deposit} ${currency}\nSystem Bonus: ${systemBonus} ${currency}\nVoucher Amount: ${voucherAmount.toFixed(2)} ${currency}`;
+  }
+  document.getElementById('output').value = template;
+}
+
+function copyTemplate() {
+  document.getElementById('output').select();
+  document.execCommand('copy');
+}
+
+function countVoucher() {
+  const currency = document.getElementById('currency').value;
+  const output = document.getElementById('output').value;
+  if (output.trim() === '') return;
+  const lastLine = output.split('\n').pop();
+  const amount = parseFloat(lastLine.replace(/[^0-9.]/g, '')) || 0;
+  if (!voucherStats[currency]) voucherStats[currency] = { count: 0, total: 0 };
+  voucherStats[currency].count++;
+  voucherStats[currency].total += amount;
+  updateStats();
+}
+
+function countProvidedVoucher() {
+  const currency = document.getElementById('providedCurrency').value;
+  const amount = parseFloat(document.getElementById('providedAmount').value) || 0;
+  if (!providedStatsData[currency]) providedStatsData[currency] = { count: 0, total: 0 };
+  providedStatsData[currency].count++;
+  providedStatsData[currency].total += amount;
+  updateStats();
+}
+
+function updateStats() {
+  let createdStatsHTML = Object.entries(voucherStats).map(([cur, data]) => `(${cur}) Total Vouchers: ${data.count}, Total Amount: ${data.total.toFixed(2)} ${cur}`).join('<br>');
+  let providedStatsHTML = Object.entries(providedStatsData).map(([cur, data]) => `(${cur}) Total Provided Vouchers: ${data.count}, Total Provided Amount: ${data.total.toFixed(2)} ${cur}`).join('<br>');
+  let combinedHTML = Object.keys({...voucherStats, ...providedStatsData}).map(cur => {
+    const createdTotal = voucherStats[cur]?.total || 0;
+    const providedTotal = providedStatsData[cur]?.total || 0;
+    return `(${cur}) Combined Income: ${(createdTotal + providedTotal).toFixed(2)} ${cur}`;
+  }).join('<br>');
+
+  document.getElementById('stats').innerHTML = createdStatsHTML || 'Total Vouchers: 0';
+  document.getElementById('providedStats').innerHTML = providedStatsHTML || 'Total Provided Vouchers: 0';
+  document.getElementById('combinedStats').innerHTML = combinedHTML || 'Combined Income (Created + Provided): 0';
+}
+</script>
 </body>
 </html>
