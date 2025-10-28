@@ -96,17 +96,12 @@ function setPresetPeriod() {
 
 function toggleFieldsAndClear() {
   const type = document.getElementById('templateType').value;
-
   document.getElementById('lossFields').style.display = (type === 'On Loss') ? 'block' : 'none';
   document.getElementById('depositFields').style.display = (type === 'On Deposit') ? 'block' : 'none';
-
-  // Hide/Show Select Period based on type
   document.getElementById('presetPeriodLabel').style.display = (type === 'On Loss') ? 'block' : 'none';
   document.getElementById('presetPeriod').style.display = (type === 'On Loss') ? 'block' : 'none';
-
   const startDateField = document.getElementById('startDate');
   const endDateField = document.getElementById('endDate');
-
   if (type === 'On Loss') {
     startDateField.type = 'date';
     endDateField.type = 'date';
@@ -114,10 +109,8 @@ function toggleFieldsAndClear() {
     startDateField.type = 'datetime-local';
     endDateField.type = 'datetime-local';
   }
-
   document.querySelectorAll('#deposit, #withdrawal, #bkIncome, #depositOnly, #systemBonus, #percentage')
     .forEach(el => el.value = '');
-  
   startDateField.value = '';
   endDateField.value = '';
 }
@@ -140,10 +133,8 @@ function generateTemplate() {
   const currency = document.getElementById('currency').value;
   const startDate = formatDate(document.getElementById('startDate').value.split('T')[0]);
   const endDate = formatDate(document.getElementById('endDate').value.split('T')[0]);
-
-  let lastVoucherDateValue = document.getElementById('lastVoucherDate').value;
+  const lastVoucherDateValue = document.getElementById('lastVoucherDate').value;
   const lastVoucherDate = lastVoucherDateValue ? formatDate(lastVoucherDateValue) : 'N/A';
-
   const deposit = type === 'On Loss' ? (parseFloat(document.getElementById('deposit').value) || 0) : (parseFloat(document.getElementById('depositOnly').value) || 0);
   const withdrawal = parseFloat(document.getElementById('withdrawal')?.value) || 0;
   const bkIncome = parseFloat(document.getElementById('bkIncome')?.value) || 0;
@@ -153,11 +144,14 @@ function generateTemplate() {
   let voucherAmount = (type === 'On Loss') ? (bkIncome * percentage) / 100 : (deposit * percentage) / 100;
   if (systemBonus >= 1000) voucherAmount = Math.max(0, voucherAmount - systemBonus);
 
+  // 🔹 Here we make it approx
+  const approxVoucher = Math.round(voucherAmount);
+
   let template = `Type of Bonus: Manual\nReason for Providing: ${type}\nBK Income Period: [${startDate}] – [${endDate}]\nLast Voucher Activated: [${lastVoucherDate}]\n`;
   if (type === 'On Loss') {
-    template += `Deposit: ${deposit} ${currency}\nWithdrawal: ${withdrawal} ${currency}\nBK Income: ${bkIncome} ${currency}\nSystem Bonus: ${systemBonus} ${currency}\nVoucher Amount: ${voucherAmount.toFixed(2)} ${currency}`;
+    template += `Deposit: ${deposit} ${currency}\nWithdrawal: ${withdrawal} ${currency}\nBK Income: ${bkIncome} ${currency}\nSystem Bonus: ${systemBonus} ${currency}\nVoucher Amount: ${approxVoucher} ${currency}`;
   } else {
-    template += `Deposit: ${deposit} ${currency}\nSystem Bonus: ${systemBonus} ${currency}\nVoucher Amount: ${voucherAmount.toFixed(2)} ${currency}`;
+    template += `Deposit: ${deposit} ${currency}\nSystem Bonus: ${systemBonus} ${currency}\nVoucher Amount: ${approxVoucher} ${currency}`;
   }
   document.getElementById('output').value = template;
 }
@@ -196,7 +190,6 @@ function updateStats() {
     const providedTotal = providedStatsData[cur]?.total || 0;
     return `(${cur}) Combined Income: ${(createdTotal + providedTotal).toFixed(2)} ${cur}`;
   }).join('<br>');
-
   document.getElementById('stats').innerHTML = createdStatsHTML || 'Total Vouchers: 0';
   document.getElementById('providedStats').innerHTML = providedStatsHTML || 'Total Provided Vouchers: 0';
   document.getElementById('combinedStats').innerHTML = combinedHTML || 'Combined Income (Created + Provided): 0';
