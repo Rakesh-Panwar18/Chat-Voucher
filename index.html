@@ -122,17 +122,27 @@ function checkBkIncome() {
   document.getElementById('bkWarning').style.display = Math.abs(bkIncome - (deposit - withdrawal)) > 0.01 ? 'block' : 'none';
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const [year, month, day] = dateStr.split('-');
-  return `${day}-${month}-${year}`;
+// ✅ New function: Supports date + time
+function formatDate(dateTimeStr) {
+  if (!dateTimeStr) return '';
+  if (dateTimeStr.includes('T')) {
+    const [datePart, timePart] = dateTimeStr.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hour, minute] = timePart.split(':');
+    return `${day}-${month}-${year} ${hour}:${minute}`;
+  } else {
+    const [year, month, day] = dateTimeStr.split('-');
+    return `${day}-${month}-${year}`;
+  }
 }
 
 function generateTemplate() {
   const type = document.getElementById('templateType').value;
   const currency = document.getElementById('currency').value;
-  const startDate = formatDate(document.getElementById('startDate').value.split('T')[0]);
-  const endDate = formatDate(document.getElementById('endDate').value.split('T')[0]);
+  const startDateRaw = document.getElementById('startDate').value;
+  const endDateRaw = document.getElementById('endDate').value;
+  const startDate = formatDate(startDateRaw);
+  const endDate = formatDate(endDateRaw);
   const lastVoucherDateValue = document.getElementById('lastVoucherDate').value;
   const lastVoucherDate = lastVoucherDateValue ? formatDate(lastVoucherDateValue) : 'N/A';
   const deposit = type === 'On Loss' ? (parseFloat(document.getElementById('deposit').value) || 0) : (parseFloat(document.getElementById('depositOnly').value) || 0);
@@ -143,8 +153,6 @@ function generateTemplate() {
 
   let voucherAmount = (type === 'On Loss') ? (bkIncome * percentage) / 100 : (deposit * percentage) / 100;
   if (systemBonus >= 1000) voucherAmount = Math.max(0, voucherAmount - systemBonus);
-
-  // 🔹 Here we make it approx
   const approxVoucher = Math.round(voucherAmount);
 
   let template = `Type of Bonus: Manual\nReason for Providing: ${type}\nBK Income Period: [${startDate}] – [${endDate}]\nLast Voucher Activated: [${lastVoucherDate}]\n`;
