@@ -61,7 +61,7 @@
     <label>System Bonus:</label>
     <input type="number" id="systemBonus">
     <label>Voucher Amount (%):</label>
-    <input type="number" id="percentage" value="12">
+    <input type="number" id="percentage" value="10">
     <button onclick="generateTemplate()">Generate Template</button>
     <button id="copyBtn" onclick="copyTemplate()">Copy</button>
     <button onclick="countVoucher()">Count Voucher</button>
@@ -139,7 +139,7 @@ function formatDate(dateTimeStr) {
 function generateTemplate() {
   const type = document.getElementById('templateType').value;
   const currency = document.getElementById('currency').value;
-  const startDateRaw = document.getElementById('startDate').value;
+  const startDateRaw = document.getElementById('startDate').value; 
   const endDateRaw = document.getElementById('endDate').value;
   const startDate = formatDate(startDateRaw);
   const endDate = formatDate(endDateRaw);
@@ -149,7 +149,7 @@ function generateTemplate() {
   const withdrawal = parseFloat(document.getElementById('withdrawal')?.value) || 0;
   const bkIncome = parseFloat(document.getElementById('bkIncome')?.value) || 0;
   const systemBonus = parseFloat(document.getElementById('systemBonus').value) || 0;
-  const percentage = parseFloat(document.getElementById('percentage').value) || 12;
+  const percentage = parseFloat(document.getElementById('percentage').value) || 10;
 
   let voucherAmount = (type === 'On Loss') ? (bkIncome * percentage) / 100 : (deposit * percentage) / 100;
   if (systemBonus >= 1000) voucherAmount = Math.max(0, voucherAmount - systemBonus);
